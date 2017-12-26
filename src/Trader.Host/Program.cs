@@ -1,24 +1,42 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
 using System.Net.WebSockets;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+#pragma warning disable 4014
 
 namespace Trader.Host
 {
     class Program
     {
-        private const string Host = "https://api.binance.com";
-
         private static void Main(string[] args)
         {
             MainAsync().Wait();
         }
 
         private static async Task MainAsync()
+        {
+            //await DepthSockets();
+
+            var reader = new OrdersReader();
+
+            while (true)
+            {
+                Task.Run(async () =>
+                {
+                    var orders = await reader.Read("LTCUSDT");
+                });
+
+
+                await Task.Delay(5000);
+            }
+        }
+
+        private static async Task DepthSockets()
         {
             using (var ws = new ClientWebSocket())
             {
@@ -32,37 +50,21 @@ namespace Trader.Host
                 while (ws.State == WebSocketState.Open)
                 {
                     WebSocketReceiveResult result;
+                    var response = new StringBuilder(1024 * 4);
 
                     do
                     {
                         result = await ws.ReceiveAsync(
                             new ArraySegment<byte>(buffer),
                             CancellationToken.None);
+
+                        response.Append(Encoding.UTF8.GetString(buffer));
+
                     } while (!result.EndOfMessage);
 
-
-                    var data = Encoding.UTF8.GetString(buffer);
-
-                    Console.WriteLine(data);
+                    Console.WriteLine(response);
                 }
-
-                //var http = new HttpClient();
-
-                //var response = http.GetAsync(Host + "/api/v1/depth?symbol=LTCUSDT").Result.Content.ReadAsStringAsync()
-                //.Result;
-
-                //var obj = JsonConvert.DeserializeObject<OrderBookResponse>(response);
             }
-        }
-
-        [DataContract]
-        public class OrderBookResponse
-        {
-            [DataMember(Name = "lastUpdateId")] public long LastUpdateId { get; set; }
-
-            [DataMember(Name = "bids")] public List<List<object>> Bids { get; set; }
-
-            [DataMember(Name = "asks")] public List<List<object>> Asks { get; set; }
         }
     }
 }
