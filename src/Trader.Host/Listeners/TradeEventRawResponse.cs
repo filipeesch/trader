@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Trader.Host
+namespace Trader.Host.Listeners
 {
     [DataContract]
     public class TradeEventRawResponse

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Trader.Host
+namespace Trader.Host.Listeners
 {
     public class TradeEventResponse
     {

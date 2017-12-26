@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 #pragma warning disable 4014
 
-namespace Trader.Host
+namespace Trader.Host.Listeners
 {
     public class WebSocketListener : IDisposable
     {

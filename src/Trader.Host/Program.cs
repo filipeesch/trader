@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
+﻿using System;
+using System.Globalization;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Trader.Host.HttpOperations;
+using Trader.Host.Listeners;
+
 #pragma warning disable 4014
 
 namespace Trader.Host
@@ -14,12 +15,30 @@ namespace Trader.Host
     {
         private static void Main(string[] args)
         {
+            ServicePointManager.ServerCertificateValidationCallback =
+                delegate (object s, X509Certificate certificate,
+                    X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                { return true; };
+
             MainAsync().Wait();
         }
 
         private static async Task MainAsync()
         {
-            await DepthSockets();
+
+            var op = new OrderOperations();
+
+            await op.Create(new CreateOrderRequest
+            {
+                Side = OrderSide.Buy,
+                Symbol = "ltcusdt",
+                Type = OrderType.Limit,
+                Date = DateTime.UtcNow,
+                Price = 100,
+                Quantity = 0.1m
+            });
+
+            //await DepthSockets();
 
             //var reader = new OrdersReader();
 
@@ -44,16 +63,17 @@ namespace Trader.Host
 
         private static async Task DepthSockets()
         {
-            var tradesListener = new WebSocketListener("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
-
-            tradesListener.Listen<TradeEventRawResponse>(x =>
+            using (var tradesListener = new CoinTradeListener("btcusdt"))
             {
-                var response = TradeEventResponse.Parse(x);
+                tradesListener.Listen(response =>
+                {
+                    Console.WriteLine("Price: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+                });
 
-                Console.WriteLine("Price: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
-            });
+                Console.ReadKey();
 
-            Console.ReadKey();
+                tradesListener.Dispose();
+            }
         }
     }
 }
