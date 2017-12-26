@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
@@ -20,51 +19,41 @@ namespace Trader.Host
 
         private static async Task MainAsync()
         {
-            //await DepthSockets();
+            await DepthSockets();
 
-            var reader = new OrdersReader();
+            //var reader = new OrdersReader();
 
-            while (true)
-            {
-                Task.Run(async () =>
-                {
-                    var orders = await reader.Read("LTCUSDT");
-                });
+            //while (true)
+            //{
+            //    reader.Read("BTCUSDT", 100).ContinueWith(result =>
+            //     {
+            //         var orders = result.Result;
+
+            //         var media = (orders.Asks[0].Price + orders.Bids[0].Price) / 2m;
+
+            //         var intencaoDeCompra = orders.Bids.Sum(x => (100 / (media - x.Price)) * x.Quantity);
+            //         var intencaoDeVenda = orders.Asks.Sum(x => (100 / (x.Price - media)) * x.Quantity);
+
+            //         Console.WriteLine(intencaoDeCompra - intencaoDeVenda);
+            //     });
 
 
-                await Task.Delay(5000);
-            }
+            //    await Task.Delay(2000);
+            //}
         }
 
         private static async Task DepthSockets()
         {
-            using (var ws = new ClientWebSocket())
+            var tradesListener = new WebSocketListener("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
+
+            tradesListener.Listen<TradeEventRawResponse>(x =>
             {
+                var response = TradeEventResponse.Parse(x);
 
-                await ws.ConnectAsync(
-                    new Uri("wss://stream.binance.com:9443/ws/ltcusdt@depth"),
-                    CancellationToken.None);
+                Console.WriteLine("Price: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+            });
 
-                var buffer = new byte[1024];
-
-                while (ws.State == WebSocketState.Open)
-                {
-                    WebSocketReceiveResult result;
-                    var response = new StringBuilder(1024 * 4);
-
-                    do
-                    {
-                        result = await ws.ReceiveAsync(
-                            new ArraySegment<byte>(buffer),
-                            CancellationToken.None);
-
-                        response.Append(Encoding.UTF8.GetString(buffer));
-
-                    } while (!result.EndOfMessage);
-
-                    Console.WriteLine(response);
-                }
-            }
+            Console.ReadKey();
         }
     }
 }

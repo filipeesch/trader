@@ -52,6 +52,9 @@
     <Compile Include="OrdersReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TradeEventRawResponse.cs" />
+    <Compile Include="TradeEventResponse.cs" />
+    <Compile Include="WebSocketListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
