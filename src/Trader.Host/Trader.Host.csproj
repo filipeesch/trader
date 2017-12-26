@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\DateHelpers.cs" />
+    <Compile Include="HttpOperations\CancelOrderRequest.cs" />
+    <Compile Include="HttpOperations\NewOrderRequest.cs" />
     <Compile Include="HttpOperations\OrderOperations.cs" />
     <Compile Include="Listeners\CoinTradeListener.cs" />
     <Compile Include="Order.cs" />

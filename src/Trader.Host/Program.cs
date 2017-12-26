@@ -25,17 +25,25 @@ namespace Trader.Host
 
         private static async Task MainAsync()
         {
-
             var op = new OrderOperations();
 
-            await op.Create(new CreateOrderRequest
+            await op.NewOrder(new NewOrderRequest
             {
+                OrderId = "teste1",
                 Side = OrderSide.Buy,
                 Symbol = "ltcusdt",
-                Type = OrderType.Limit,
+                Type = OrderType.Stop,
                 Date = DateTime.UtcNow,
+                StopPrice = 99,
                 Price = 100,
                 Quantity = 0.1m
+            });
+
+            await op.CancelOrder(new CancelOrderRequest
+            {
+                OrigOrderId = "teste1",
+                Symbol = "ltcusdt",
+                Date = DateTime.UtcNow
             });
 
             //await DepthSockets();
