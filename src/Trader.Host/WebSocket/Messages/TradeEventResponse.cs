@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Trader.Host.Listeners
+namespace Trader.Host.WebSocket.Messages
 {
     public class TradeEventResponse
     {

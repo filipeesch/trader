@@ -5,9 +5,8 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Trader.Host.HttpOperations;
-using Trader.Host.Listeners;
-
-#pragma warning disable 4014
+using Trader.Host.WebSocket.Core;
+using Trader.Host.WebSocket.Listeners;
 
 namespace Trader.Host
 {
@@ -15,38 +14,35 @@ namespace Trader.Host
     {
         private static void Main(string[] args)
         {
-            ServicePointManager.ServerCertificateValidationCallback =
-                delegate (object s, X509Certificate certificate,
-                    X509Chain chain, SslPolicyErrors sslPolicyErrors)
-                { return true; };
+            ServicePointManager.ServerCertificateValidationCallback = (s, certificate, chain, sslPolicyErrors) => true;
 
             MainAsync().Wait();
         }
 
         private static async Task MainAsync()
         {
-            var op = new OrderOperations();
+            //var op = new OrderOperations();
 
-            await op.NewOrder(new NewOrderRequest
-            {
-                OrderId = "teste1",
-                Side = OrderSide.Buy,
-                Symbol = "ltcusdt",
-                Type = OrderType.Stop,
-                Date = DateTime.UtcNow,
-                StopPrice = 99,
-                Price = 100,
-                Quantity = 0.1m
-            });
+            //await op.NewOrder(new NewOrderRequest
+            //{
+            //    OrderId = "teste1",
+            //    Side = OrderSide.Buy,
+            //    Symbol = "ltcusdt",
+            //    Type = OrderType.Stop,
+            //    Date = DateTime.UtcNow,
+            //    StopPrice = 99,
+            //    Price = 100,
+            //    Quantity = 0.1m
+            //});
 
-            await op.CancelOrder(new CancelOrderRequest
-            {
-                OrigOrderId = "teste1",
-                Symbol = "ltcusdt",
-                Date = DateTime.UtcNow
-            });
+            //await op.CancelOrder(new CancelOrderRequest
+            //{
+            //    OrigOrderId = "teste1",
+            //    Symbol = "ltcusdt",
+            //    Date = DateTime.UtcNow
+            //});
 
-            //await DepthSockets();
+            await DepthSockets();
 
             //var reader = new OrdersReader();
 
@@ -71,16 +67,21 @@ namespace Trader.Host
 
         private static async Task DepthSockets()
         {
-            using (var tradesListener = new CoinTradeListener("btcusdt"))
+            using (var binanceSocket = new BinanceWebSocket())
             {
-                tradesListener.Listen(response =>
+                binanceSocket.Register(new AggregatedTradeEventListener("btcusdt", response =>
                 {
-                    Console.WriteLine("Price: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
-                });
+                    Console.WriteLine("BTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+                }));
+
+                binanceSocket.Register(new AggregatedTradeEventListener("ltcusdt", response =>
+                {
+                    Console.WriteLine("LTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+                }));
+
+                await binanceSocket.Start();
 
                 Console.ReadKey();
-
-                tradesListener.Dispose();
             }
         }
     }

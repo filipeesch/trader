@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Trader.Host.Listeners
+namespace Trader.Host.WebSocket.Messages
 {
     [DataContract]
     public class TradeEventRawResponse

@@ -7,36 +7,24 @@ using Newtonsoft.Json;
 
 #pragma warning disable 4014
 
-namespace Trader.Host.Listeners
+namespace Trader.Host.WebSocket.Core
 {
     public class WebSocketListener : IDisposable
     {
-        private readonly string _uri;
         private readonly ClientWebSocket _client;
         private bool _running = false;
 
-        public WebSocketListener(string uri)
+        public WebSocketListener()
         {
-            _uri = uri;
             _client = new ClientWebSocket();
         }
 
-        public async Task Listen(Action<string> handler)
+        public void OnMessage(Action<string> handler)
         {
-            if (_running)
-                return;
-
-            _running = true;
-
-            await Connect();
-
             Task.Run(async () =>
             {
                 while (_running)
                 {
-                    if (_client.State != WebSocketState.Open)
-                        await Connect();
-
                     var response = await ReadResponse();
 
                     handler(response.ToString());
@@ -44,17 +32,25 @@ namespace Trader.Host.Listeners
             });
         }
 
-        public async Task Listen<T>(Action<T> handler)
+        public void OnMessage<T>(Action<T> handler)
         {
-            await Listen(response => handler(JsonConvert.DeserializeObject<T>(response)));
+            OnMessage(response => handler(JsonConvert.DeserializeObject<T>(response)));
         }
 
-        private async Task Connect()
+        public async Task Connect(string uri)
         {
-            await _client.ConnectAsync(new Uri(_uri), CancellationToken.None);
+            if (_running)
+                return;
+
+            _running = true;
+
+            await _client.ConnectAsync(new Uri(uri), CancellationToken.None);
 
             if (_client.State != WebSocketState.Open)
-                throw new Exception($"Não foi possível conectar no endereço '{_uri}'");
+            {
+                _running = false;
+                throw new Exception($"Não foi possível conectar no endereço '{uri}'");
+            }
         }
 
         private async Task<StringBuilder> ReadResponse()
