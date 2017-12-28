@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Trader.Host
+namespace Trader.Host.WebSocket.Messages
 {
     [DataContract]
-    public class OrdersBookResponse
+    public class OrdersBookRawResponse
     {
         [DataMember(Name = "lastUpdateId")]
         public long LastUpdateId { get; set; }

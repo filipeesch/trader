@@ -1,31 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
-namespace Trader.Host
+namespace Trader.Host.WebSocket.Messages
 {
-    public class OrdersReader
+    public class OrdersBookResponse
     {
-        private const string Host = "https://api.binance.com";
-
-        public async Task<OrdersBook> Read(string symbol, int limit = 100)
+        public OrdersBookResponse()
         {
-            var http = new HttpClient();
-
-            using (var response = await http.GetAsync($"{Host}/api/v1/depth?symbol={symbol}&limit={limit}"))
-            {
-                var responseText = await response.Content.ReadAsStringAsync();
-
-                return MapDepthResponse(JsonConvert.DeserializeObject<OrdersBookResponse>(responseText));
-            }
+            Bids = new List<Order>(100);
+            Asks = new List<Order>(100);
         }
 
-        private OrdersBook MapDepthResponse(OrdersBookResponse data)
+        public long LastUpdateId { get; private set; }
+
+        public List<Order> Bids { get; private set; }
+
+        public List<Order> Asks { get; private set; }
+
+        public static OrdersBookResponse Parse(OrdersBookRawResponse data)
         {
-            var orders = new OrdersBook
+            var orders = new OrdersBookResponse
             {
                 LastUpdateId = data.LastUpdateId,
                 Bids = data.Bids.Select(x => new Order

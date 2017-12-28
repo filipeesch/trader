@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -67,16 +69,28 @@ namespace Trader.Host
 
         private static async Task DepthSockets()
         {
+            const string symbol = "btcusdt";
+
+            var mediaPreco = new Queue<decimal>(16);
+
             using (var binanceSocket = new BinanceWebSocket())
             {
-                binanceSocket.Register(new AggregatedTradeEventListener("btcusdt", response =>
-                {
-                    Console.WriteLine("BTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
-                }));
+                var book = new OrderBook(binanceSocket, symbol);
 
-                binanceSocket.Register(new AggregatedTradeEventListener("ltcusdt", response =>
+
+                binanceSocket.Register(new AggregatedTradeEventListener(symbol, response =>
                 {
-                    Console.WriteLine("LTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+                    //Console.WriteLine("BTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+
+                    mediaPreco.Enqueue(response.Price);
+
+                    if (mediaPreco.Count > 5)
+                    {
+                        mediaPreco.Dequeue();
+
+                        Console.WriteLine("Preço médio: {0:N8}\tPreço: {1:N8}",
+                            Math.Round(mediaPreco.Average(), 8), response.Price);
+                    }
                 }));
 
                 await binanceSocket.Start();

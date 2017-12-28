@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Trader.Host.WebSocket.Core
     {
         private readonly WebSocketListener _webSocket;
 
-        private readonly List<IBinanceEventListener> _listeners = new List<IBinanceEventListener>();
+        private readonly ConcurrentBag<IBinanceEventListener> _listeners = new ConcurrentBag<IBinanceEventListener>();
 
         public BinanceWebSocket()
         {
@@ -33,7 +34,7 @@ namespace Trader.Host.WebSocket.Core
 
             _listeners
                 .Where(x => x.EventUri == message.Stream)
-                .ForEach(x => x.RawAction(message.Data));
+                .ForEach(x => Task.Run(() => x.RawAction(message.Data)));
         }
 
         public async Task Start()
