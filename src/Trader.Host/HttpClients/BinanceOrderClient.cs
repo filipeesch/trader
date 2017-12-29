@@ -13,7 +13,7 @@ namespace Trader.Host.HttpClients
         {
             var http = new HttpClient();
 
-            using (var response = await http.GetAsync($"{Host}/api/v1/depth?symbol={symbol}&limit={limit}"))
+            using (var response = await http.GetAsync($"{Host}/api/v1/depth?symbol={symbol.ToUpper()}&limit={limit}"))
             {
                 var responseText = await response.Content.ReadAsStringAsync();
 

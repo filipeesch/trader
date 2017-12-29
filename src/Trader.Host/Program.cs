@@ -78,22 +78,39 @@ namespace Trader.Host
                 var book = new OrderBook(binanceSocket, symbol);
 
 
-                binanceSocket.Register(new AggregatedTradeEventListener(symbol, response =>
+                //binanceSocket.Register(new AggregatedTradeEventListener(symbol, response =>
+                //{
+                //    //Console.WriteLine("BTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+
+                //    mediaPreco.Enqueue(response.Price);
+
+                //    if (mediaPreco.Count > 5)
+                //    {
+                //        mediaPreco.Dequeue();
+
+                //        Console.WriteLine("Preço médio: {0:N8}\tPreço: {1:N8}",
+                //            Math.Round(mediaPreco.Average(), 8), response.Price);
+                //    }
+                //}));
+
+
+                book.OnUpdate(x =>
                 {
-                    //Console.WriteLine("BTC -> USDT\tPrice: {0:N8}\t\tQtd: {1:N8}", response.Price, response.Quantity);
+                    Console.Clear();
 
-                    mediaPreco.Enqueue(response.Price);
-
-                    if (mediaPreco.Count > 5)
+                    for (var i = 0; i < 20; ++i)
                     {
-                        mediaPreco.Dequeue();
-
-                        Console.WriteLine("Preço médio: {0:N8}\tPreço: {1:N8}",
-                            Math.Round(mediaPreco.Average(), 8), response.Price);
+                        Console.WriteLine("Preço: {0:N4}\tQtd: {1:N4}\t\t\t{2:N4}\tQtd: {3:N4}",
+                            x.Bids.ElementAt(i).Price,
+                            x.Bids.ElementAt(i).Quantity,
+                            x.Asks.ElementAt(i).Price,
+                            x.Asks.ElementAt(i).Quantity);
                     }
-                }));
+                });
+
 
                 await binanceSocket.Start();
+                await book.Start();
 
                 Console.ReadKey();
             }

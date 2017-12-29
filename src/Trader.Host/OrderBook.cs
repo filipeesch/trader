@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Trader.Host.HttpClients;
 using Trader.Host.WebSocket.Core;
 using Trader.Host.WebSocket.Messages;
@@ -22,6 +24,7 @@ namespace Trader.Host
         private readonly BinanceOrderClient _orderClient = new BinanceOrderClient();
 
         private Action<OrderBookUpdateArgs> _hanlder;
+        private long _nextUpdateId;
 
         public OrderBook(BinanceWebSocket binanceSocket, string symbol)
         {
@@ -38,35 +41,26 @@ namespace Trader.Host
             book.Bids.ForEach(x => _bids.Add(x.Price, x));
 
             ProcessMessages(book);
+
+            _messages.CollectionChanged += (sender, args) =>
+            {
+                if (args.Action != NotifyCollectionChangedAction.Add)
+                    return;
+
+                UpdateBook(_messages);
+            };
         }
 
         private void ProcessMessages(OrdersBookResponse book)
         {
-            var messages = _messages.Where(x => x.FinalUpdateId > book.LastUpdateId).ToList();
-            _messages.Clear();
+            _messages
+                .Where(x => x.FinalUpdateId <= book.LastUpdateId)
+                .ToList()
+                .ForEach(x => _messages.Remove(x));
 
-            var nextUpdateId = book.LastUpdateId + 1;
+            _nextUpdateId = book.LastUpdateId + 1;
 
-            while (true)
-            {
-                var message = messages.FirstOrDefault(x => x.FirstUpdateId == nextUpdateId);
-
-                if (message == null)
-                    break;
-
-                messages.Remove(message);
-
-                nextUpdateId = message.FinalUpdateId + 1;
-
-                UpdateOrders(_bids, message.Bids);
-                UpdateOrders(_asks, message.Asks);
-            }
-
-            _hanlder(new OrderBookUpdateArgs
-            {
-                Bids = _bids.Values,
-                Asks = _asks.Values
-            });
+            UpdateBook(_messages);
 
             /*
              Drop any event where u is <= lastUpdateId in the snapshot
@@ -75,17 +69,45 @@ namespace Trader.Host
              */
         }
 
-        private void UpdateOrders(IDictionary<decimal, Order> oldOrders, IEnumerable<Order> newOrders)
+        private void UpdateBook(ICollection<OrdersBookMessage> messages)
+        {
+            while (true)
+            {
+                var message = messages
+                    .OrderBy(x => x.FirstUpdateId)
+                    .FirstOrDefault(x => x.FirstUpdateId <= _nextUpdateId);
+
+                if (message == null)
+                    break;
+
+                messages.Remove(message);
+
+                _nextUpdateId = message.FinalUpdateId + 1;
+
+                UpdateOrders(_bids, message.Bids);
+                UpdateOrders(_asks, message.Asks);
+            }
+
+            _hanlder(new OrderBookUpdateArgs
+            {
+                Bids = _bids.Values.OrderByDescending(x => x.Price),
+                Asks = _asks.Values.OrderBy(x => x.Price)
+            });
+        }
+
+        private void UpdateOrders(IDictionary<decimal, Order> orders, IEnumerable<Order> newOrders)
         {
             foreach (var newOrder in newOrders)
             {
                 if (newOrder.Quantity == 0m)
-                    oldOrders.Remove(newOrder.Price);
+                    orders.Remove(newOrder.Price);
 
-                else if (oldOrders.TryGetValue(newOrder.Price, out var oldOrder))
+                else if (orders.TryGetValue(newOrder.Price, out var order))
                 {
-                    oldOrder.Quantity = newOrder.Quantity;
+                    order.Quantity = newOrder.Quantity;
                 }
+                else
+                    orders.Add(newOrder.Price, newOrder);
             }
         }
 
