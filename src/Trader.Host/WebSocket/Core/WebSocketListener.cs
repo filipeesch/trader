@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -27,7 +29,7 @@ namespace Trader.Host.WebSocket.Core
                 {
                     var response = await ReadResponse();
 
-                    handler(response.ToString());
+                    handler(response);
                 }
             });
         }
@@ -53,12 +55,12 @@ namespace Trader.Host.WebSocket.Core
             }
         }
 
-        private async Task<StringBuilder> ReadResponse()
+        private async Task<string> ReadResponse()
         {
             var buffer = new byte[1024];
 
             WebSocketReceiveResult result;
-            var response = new StringBuilder(1024 * 4);
+            var response = new List<byte>(8 * 1024);
 
             do
             {
@@ -66,10 +68,11 @@ namespace Trader.Host.WebSocket.Core
                     new ArraySegment<byte>(buffer),
                     CancellationToken.None);
 
-                response.Append(Encoding.UTF8.GetString(buffer));
+                response.AddRange(buffer.Take(result.Count));
+
             } while (!result.EndOfMessage);
 
-            return response;
+            return Encoding.UTF8.GetString(response.ToArray());
         }
 
         public void Dispose()
