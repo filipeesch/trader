@@ -1,6 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
-using Trader.Host.WebSocket.Messages;
+using Trader.Host.Messages;
 
 namespace Trader.Host.WebSocket.Listeners
 {

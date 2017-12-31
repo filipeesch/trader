@@ -1,7 +1,8 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Trader.Host.WebSocket.Messages;
+using Trader.Host.Messages;
 
 namespace Trader.Host.HttpClients
 {
@@ -18,6 +19,20 @@ namespace Trader.Host.HttpClients
                 var responseText = await response.Content.ReadAsStringAsync();
 
                 return OrdersBookResponse.Parse(JsonConvert.DeserializeObject<OrdersBookRawResponse>(responseText));
+            }
+        }
+
+        public async Task<KlinesResponse> Klines(string symbol, string interval = "1m", int limit = 500)
+        {
+            var http = new HttpClient();
+
+            var url = $"{Host}/api/v1/klines?symbol={symbol.ToUpper()}&interval={interval}&limit={limit}";
+
+            using (var response = await http.GetAsync(url))
+            {
+                var responseText = await response.Content.ReadAsStringAsync();
+
+                return KlinesResponse.Parse(JsonConvert.DeserializeObject<List<List<object>>>(responseText));
             }
         }
     }

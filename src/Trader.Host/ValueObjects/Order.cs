@@ -1,4 +1,4 @@
-﻿namespace Trader.Host
+﻿namespace Trader.Host.ValueObjects
 {
     public class Order
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Trader.Host.Helpers;
+using Trader.Host.ValueObjects;
 
-namespace Trader.Host.WebSocket.Messages
+namespace Trader.Host.Messages
 {
     public class OrdersBookMessage
     {

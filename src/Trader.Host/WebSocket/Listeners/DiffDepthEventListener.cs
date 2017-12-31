@@ -1,9 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
-using Trader.Host.WebSocket.Listeners;
-using Trader.Host.WebSocket.Messages;
+using Trader.Host.Messages;
 
-namespace Trader.Host
+namespace Trader.Host.WebSocket.Listeners
 {
     public class DiffDepthEventListener : IBinanceEventListener
     {

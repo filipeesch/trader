@@ -2,7 +2,7 @@
 using System.Text;
 using Trader.Host.Helpers;
 
-namespace Trader.Host.HttpOperations
+namespace Trader.Host.Messages
 {
     public class CancelOrderRequest
     {

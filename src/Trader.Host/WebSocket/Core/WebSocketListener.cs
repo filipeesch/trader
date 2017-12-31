@@ -34,11 +34,6 @@ namespace Trader.Host.WebSocket.Core
             });
         }
 
-        public void OnMessage<T>(Action<T> handler)
-        {
-            OnMessage(response => handler(JsonConvert.DeserializeObject<T>(response)));
-        }
-
         public async Task Connect(string uri)
         {
             if (_running)

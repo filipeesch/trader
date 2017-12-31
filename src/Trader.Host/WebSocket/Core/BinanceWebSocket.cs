@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Trader.Host.Helpers;
+using Trader.Host.Messages;
 using Trader.Host.WebSocket.Listeners;
-using Trader.Host.WebSocket.Messages;
 
 namespace Trader.Host.WebSocket.Core
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Trader.Host.WebSocket.Messages
+namespace Trader.Host.Messages
 {
     [DataContract]
     public class OrdersBookRawResponse

@@ -6,8 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Trader.Host.HttpClients;
+using Trader.Host.Messages;
+using Trader.Host.ValueObjects;
 using Trader.Host.WebSocket.Core;
-using Trader.Host.WebSocket.Messages;
+using Trader.Host.WebSocket.Listeners;
 
 namespace Trader.Host
 {
@@ -115,11 +117,11 @@ namespace Trader.Host
         {
             _hanlder = handler;
         }
+    }
 
-        public class OrderBookUpdateArgs
-        {
-            public IEnumerable<Order> Asks { get; set; }
-            public IEnumerable<Order> Bids { get; set; }
-        }
+    public class OrderBookUpdateArgs
+    {
+        public IEnumerable<Order> Asks { get; set; }
+        public IEnumerable<Order> Bids { get; set; }
     }
 }

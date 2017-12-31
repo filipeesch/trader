@@ -47,28 +47,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\KlinesResponse.cs" />
+    <Compile Include="Helpers\Timer.cs" />
+    <Compile Include="ValueObjects\KlinesValue.cs" />
+    <Compile Include="Services\AverageCalculator.cs" />
+    <Compile Include="WebSocket\Listeners\KlineEventListener.cs" />
     <Compile Include="WebSocket\Listeners\DiffDepthEventListener.cs" />
     <Compile Include="Helpers\ColletionExtensions.cs" />
     <Compile Include="Helpers\DateHelpers.cs" />
-    <Compile Include="HttpOperations\CancelOrderRequest.cs" />
-    <Compile Include="HttpOperations\NewOrderRequest.cs" />
+    <Compile Include="Messages\CancelOrderRequest.cs" />
+    <Compile Include="Messages\NewOrderRequest.cs" />
     <Compile Include="HttpOperations\OrderOperations.cs" />
     <Compile Include="OrderBook.cs" />
     <Compile Include="WebSocket\Core\BinanceWebSocket.cs" />
     <Compile Include="WebSocket\Listeners\AggregatedTradeEventListener.cs" />
-    <Compile Include="WebSocket\Messages\BinanceStreamMessage.cs" />
+    <Compile Include="Messages\BinanceStreamMessage.cs" />
     <Compile Include="WebSocket\Listeners\IBinanceEventListener.cs" />
     <Compile Include="WebSocket\Listeners\TradeEventListener.cs" />
     <Compile Include="ValueObjects\Order.cs" />
-    <Compile Include="WebSocket\Messages\OrdersBookRawMessage.cs" />
-    <Compile Include="WebSocket\Messages\OrdersBookRawResponse.cs" />
+    <Compile Include="Messages\OrdersBookRawMessage.cs" />
+    <Compile Include="Messages\OrdersBookRawResponse.cs" />
     <Compile Include="HttpClients\BinanceOrderClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebSocket\Messages\OrdersBookMessage.cs" />
-    <Compile Include="WebSocket\Messages\OrdersBookResponse.cs" />
-    <Compile Include="WebSocket\Messages\TradeEventRawResponse.cs" />
-    <Compile Include="WebSocket\Messages\TradeEventResponse.cs" />
+    <Compile Include="Messages\OrdersBookMessage.cs" />
+    <Compile Include="Messages\OrdersBookResponse.cs" />
+    <Compile Include="Messages\TradeEventRawResponse.cs" />
+    <Compile Include="Messages\TradeEventResponse.cs" />
     <Compile Include="WebSocket\Core\WebSocketListener.cs" />
   </ItemGroup>
   <ItemGroup>
