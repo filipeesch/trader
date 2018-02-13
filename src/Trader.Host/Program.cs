@@ -18,15 +18,10 @@ namespace Trader.Host
 {
     internal static class Program
     {
-        private static void Main()
+        private static async Task Main()
         {
             ServicePointManager.ServerCertificateValidationCallback = (s, certificate, chain, sslPolicyErrors) => true;
 
-            MainAsync().Wait();
-        }
-
-        private static async Task MainAsync()
-        {
             var op = new UserAccountOperations();
 
             //await op.NewOrder(new NewOrderRequest
@@ -49,9 +44,9 @@ namespace Trader.Host
             //});
 
             //await DepthSockets();
-            var key = await op.CreateListenKey();
+            //var key = await op.CreateListenKey();
 
-            await op.PingListenKey(key);
+            //await op.PingListenKey(key);
 
             var a = await op.AccountInfo();
         }
