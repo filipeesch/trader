@@ -4,3 +4,4 @@
 **/packages
 
 App.config
+/src/Trader.Host/App.config
