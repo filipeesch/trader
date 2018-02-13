@@ -47,17 +47,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infrastruture\ILogger.cs" />
+    <Compile Include="Infrastruture\ConsoleLogger.cs" />
+    <Compile Include="Messages\AccountInfoBalanceResponse.cs" />
     <Compile Include="Messages\KlinesResponse.cs" />
     <Compile Include="Helpers\Timer.cs" />
+    <Compile Include="Messages\AccountInfoResponse.cs" />
     <Compile Include="ValueObjects\KlinesValue.cs" />
     <Compile Include="Services\AverageCalculator.cs" />
+    <Compile Include="Messages\AccountInfoBalanceMessage.cs" />
+    <Compile Include="WebSocket\Core\BinanceUserWebSocket.cs" />
+    <Compile Include="Messages\OnAccountInfoMessage.cs" />
+    <Compile Include="WebSocket\Core\OnExecutionReport.cs" />
     <Compile Include="WebSocket\Listeners\KlineEventListener.cs" />
     <Compile Include="WebSocket\Listeners\DiffDepthEventListener.cs" />
     <Compile Include="Helpers\ColletionExtensions.cs" />
     <Compile Include="Helpers\DateHelpers.cs" />
     <Compile Include="Messages\CancelOrderRequest.cs" />
     <Compile Include="Messages\NewOrderRequest.cs" />
-    <Compile Include="HttpOperations\OrderOperations.cs" />
+    <Compile Include="HttpOperations\UserAccountOperations.cs" />
     <Compile Include="OrderBook.cs" />
     <Compile Include="WebSocket\Core\BinanceWebSocket.cs" />
     <Compile Include="WebSocket\Listeners\AggregatedTradeEventListener.cs" />

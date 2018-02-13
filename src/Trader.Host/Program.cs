@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Trader.Host.HttpClients;
+using Trader.Host.HttpOperations;
 using Trader.Host.Services;
 using Trader.Host.WebSocket.Core;
 using Trader.Host.WebSocket.Listeners;
@@ -26,7 +27,7 @@ namespace Trader.Host
 
         private static async Task MainAsync()
         {
-            //var op = new OrderOperations();
+            var op = new UserAccountOperations();
 
             //await op.NewOrder(new NewOrderRequest
             //{
@@ -47,7 +48,12 @@ namespace Trader.Host
             //    Date = DateTime.UtcNow
             //});
 
-            await DepthSockets();
+            //await DepthSockets();
+            var key = await op.CreateListenKey();
+
+            await op.PingListenKey(key);
+
+            var a = await op.AccountInfo();
         }
 
         private static async Task DepthSockets()
